@@ -6,6 +6,7 @@ import json
 import paho.mqtt.client as mqtt
 import threading
 import os, time
+from influxdb_client_3 import InfluxDBClient3, Point
 
 #importing self defined files
 from influx import influx_connection
@@ -105,12 +106,12 @@ def socket_worker():
                 if RTT is not None:
                     if ping_start_time is None:  
                         ping_start_time = time.time()
-                        print(f"Machine {host}:{port} responded in {RTT:.2f} milliseconds")
+                        print(f"Machine {host}:{PORT} responded in {RTT:.2f} milliseconds")
                 else:  
                     if ping_start_time is not None:  # Machine just became unreachable
                         ping_end_time = time.time()
                     else:
-                        print(f"Machine {host}:{port} is currently unreachable.")
+                        print(f"Machine {host}:{PORT} is currently unreachable.")
 
                 PowerOnTime = ping_end_time - ping_start_time
                 print(PowerOnTime)
