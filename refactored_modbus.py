@@ -104,32 +104,50 @@ def clear_lists(*lists):
         l.clear()
 
 
-def create_influxdb_point(timestamp, joint_values, joint_speed_values, tcp_values):
+def create_influxdb_point(timestamp, joint_values, joint_speed_values, tcp_values,
+                          safety_params_enable_status, collision_enable_status,
+                          tcp_speed_value, input_values, output_values,
+                          ainput_values, aoutput_values):
     point = Point("robot_data") \
         .tag("robot_id", "robot_1") \
         .field("timestamp", timestamp) \
-        .field("joint_value_1", joint_values[0]) \
-        .field("joint_value_2", joint_values[1]) \
-        .field("joint_value_3", joint_values[2]) \
-        .field("joint_value_4", joint_values[3]) \
-        .field("joint_value_5", joint_values[4]) \
-        .field("joint_value_6", joint_values[5]) \
-        .field("joint_value_7", joint_values[6]) \
-        .field("joint_value_8", joint_values[7]) \
         .field("joint_speed_1", joint_speed_values[0]) \
         .field("joint_speed_2", joint_speed_values[1]) \
         .field("joint_speed_3", joint_speed_values[2]) \
         .field("joint_speed_4", joint_speed_values[3]) \
         .field("joint_speed_5", joint_speed_values[4]) \
         .field("joint_speed_6", joint_speed_values[5]) \
-        .field("joint_speed_7", joint_speed_values[6]) \
-        .field("joint_speed_8", joint_speed_values[7]) \
-        .field("tcp_x", tcp_values[0]) \
-        .field("tcp_y", tcp_values[1]) \
-        .field("tcp_z", tcp_values[2]) \
-        .field("tcp_rx", tcp_values[3]) \
-        .field("tcp_ry", tcp_values[4]) \
-        .field("tcp_rz", tcp_values[5])
+        .field("collision_enable_status", collision_enable_status[0]) \
+        #.field("joint_value_1", joint_values[0]) \
+        #.field("joint_value_2", joint_values[1]) \
+        #.field("joint_value_3", joint_values[2]) \
+        #.field("joint_value_4", joint_values[3]) \
+        #.field("joint_value_5", joint_values[4]) \
+        #.field("joint_value_6", joint_values[5]) \
+        #.field("joint_value_7", joint_values[6]) \
+        #.field("joint_value_8", joint_values[7]) \
+        #.field("tcp_x", tcp_values[0]) \
+        #.field("tcp_y", tcp_values[1]) \
+        #.field("tcp_z", tcp_values[2]) \
+        #.field("tcp_rx", tcp_values[3]) \
+        #.field("tcp_ry", tcp_values[4]) \
+        #.field("tcp_rz", tcp_values[5])
+        #.field("safety_params_enable_status", safety_params_enable_status[0]) \
+        #.field("joint_speed_7", joint_speed_values[6]) \
+        #.field("tcp_speed_value", tcp_speed_value[0]) \
+        #.field("digital_input_1", input_values[0]) \
+        #.field("digital_input_2", input_values[1]) \
+        #.field("digital_input_3", input_values[2]) \
+        #.field("digital_output_1", output_values[0]) \
+        #.field("digital_output_2", output_values[1]) \
+        #.field("analog_input_1", ainput_values[0]) \
+        #.field("analog_input_2", ainput_values[1]) \
+        #.field("analog_input_3", ainput_values[2]) \
+        #.field("analog_output_1", aoutput_values[0]) \
+        #.field("analog_output_2", aoutput_values[1]) \
+        #.field("analog_output_3", aoutput_values[2]) \
+        #.field("analog_output_4", aoutput_values[3]) \
+        #.field("analog_output_5", aoutput_values[4])
 
     return point
 
@@ -170,8 +188,10 @@ def main():
         aoutput_value = convert_data(hold_aoutput)
         timestamp_value = convert_data(hold_timestamp)
 
-        print_data(joint_value, joint_speed_value, tcp_value, safety_params_enable_value, collision_enable_value,
-                   tcp_speed_value, input_value, output_value, ainput_value, aoutput_value)
+        print_data("Joint Value", joint_value, "JointSpeedValue", joint_speed_value, "tcp value", tcp_value, \
+                   "SafetyParamsEnableValue", safety_params_enable_value,  "CollisionEnableValue", collision_enable_value, 
+                   "tcpSpeedValue", tcp_speed_value, "InputValue", input_value, "outputValue", output_value, "a input value",
+                   ainput_value,"a output value" , aoutput_value)
 
         Time_stamp = get_timestamp(timestamp_value)
         print(Time_stamp)
@@ -179,11 +199,12 @@ def main():
 
         # Create InfluxDB point
         timestamp = datetime.utcnow().isoformat()
-        influx_point = create_influxdb_point(timestamp, joint_value, joint_speed_value, tcp_value)
+        influx_point = create_influxdb_point(timestamp, joint_value, joint_speed_value, tcp_value, safety_params_enable_value, collision_enable_value,
+                    tcp_speed_value, input_value, output_value, ainput_value, aoutput_value)
 
         # Write data to InfluxDB
         try:
-            influx_client.write(influx_point)
+            influx_client.write(database="final", record = influx_point)
             print("Data successfully written to InfluxDB")
         except Exception as e:
             print(f"Error writing data to InfluxDB: {e}")
