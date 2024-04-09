@@ -1,4 +1,5 @@
 import collections
+import struct
 
 # Define a dictionary outside the loop to store data format information
 # This dictionary maps human-readable names (keys) to struct format codes (values)
