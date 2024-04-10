@@ -1,9 +1,10 @@
 import socket
 import json
 import time
+from influx import influx_connection, Point
 
 
-def connect_to_controller(ip, port=8055):
+def connectETController(ip, port=8055):
     """
     Establishes a connection with the ET controller.
 
@@ -70,17 +71,33 @@ def send_command(sock, cmd, params=None, id=1):
             return (False, None, None)
     except Exception as e:
         return (False, None, None)
+        
+
+def create_influxdb_point(timestamp, servoStatus, tcp, cycle_Mode, cycle_time,
+                    ellapse_time, cycle_count, robotState):
+    point = Point("port8055") \
+        .tag("robot_id", "robot_1") \
+        .field("timestamp", timestamp) \
+        .field("servoStatus", servoStatus[0]) \
+        .field("cycle_Mode", cycle_Mode[0]) \
+        .field("cycle_time", cycle_time[0]) \
+        .field("ellapse_time", ellapse_time[0]) \
+        .field("cycle_count", cycle_count[0]) \
+        .field("robotState", robotState[0]) \
+
+    return point
 
 if __name__ == "__main__":
 # Robot IP address
     robot_ip = "192.168.1.200"
+
     conSuc, sock = connectETController(robot_ip)
     if (conSuc):
 #Get the servo status of the robotic arm
-        suc, result, id = sendCMD(sock, "getServoStatus")
-        print("Servo Status is: ",result)
-        suc, result1, id = sendCMD(sock, "get_tcp_pose", {"tool_num": 0})
-        print("Tool Number is: ",result1)
+        suc, servoStatus, id = sendCMD(sock, "getServoStatus")
+        print("Servo Status is: ",servoStatus)
+        suc, tcp, id = sendCMD(sock, "get_tcp_pose", {"tool_num": 0})
+        print("Tool Number is: ",tcp)
         suc, cycle_Mode, id = sendCMD(sock, "getCycleMode")
         print("Cycle mode is: ",cycle_Mode)
         suc, cycle_time, id = sendCMD(sock, "setSysVarD",{"addr":6,"value":123})
@@ -89,5 +106,21 @@ if __name__ == "__main__":
         print("ellapse_time is: ",ellapse_time)
         suc, cycle_count, id = sendCMD(sock, "getSysVarD",{"addr":8})
         print("Cycle_count is: ",cycle_count)
-        suc, result2 , id = sendCMD(sock, "getRobotState")
-        print("Robot Status is: ",result2)
+        suc, robotState , id = sendCMD(sock, "getRobotState")
+        print("Robot Status is: ",robotState)
+
+
+        # Establish connection to InfluxDB
+        influx_client = influx_connection()
+
+        # Create InfluxDB point
+        timestamp = datetime.utcnow().isoformat()
+        influx_point = create_influxdb_point(timestamp, servoStatus, tcp, cycle_Mode, cycle_time,
+                    ellapse_time, cycle_count, robotState)
+
+        # Write data to InfluxDB
+        try:
+            influx_client.write(database="final", record = influx_point)
+            print("Data successfully written to InfluxDB")
+        except Exception as e:
+            print(f"Error writing data to InfluxDB: {e}")
