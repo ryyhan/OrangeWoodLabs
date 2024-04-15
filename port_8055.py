@@ -4,10 +4,6 @@ import time
 import datetime
 from influx import influx_connection, Point
 
-CycleTime = -1
-cycle_start_time = -1
-RobotUtilisation = 0
-
 
 def connectETController(ip, port=8055):
     """
@@ -157,37 +153,32 @@ if __name__ == "__main__":
             #print("getJointVersion is : ", jointVersion)
             
             
-            """
             
-            #setting values
+            """setting values"""
+            #set ServoStatus
             suc, set_servo_status , id= send_command(sock,"set_servo_status",{"status":1})
             print (suc, set_servo_status, id)
+            
+            #set SystemVariableD
             suc, cycle_time, id = send_command(sock, "setSysVarD",{"addr":6,"value":123})
             #print("Cycle_time is: ",cycle_time)
-            suc, result , id = send_command(sock, "md_set_tcp", {"point": [10, 0, 0, 30, 0, 0], "tool_num": 1, "unit_type":0})
-            print (suc, result , id)
+
+            #Set Robotic Arm Tool Center
+            suc, result , id = send_command(sock, "cmd_set_tcp", {"point": [10, 0, 0, 30, 0, 0], "tool_num": 1, "unit_type":0})
+            #print (suc, result , id)
+
+            #Setusercoordinatesystemdata
             user_frame=[499.011212,570.517817, 247.082805, -3.141593, -0.000000, -0.773067]
             ret , result , id=send_command(sock,"setUserFrame",{"user_num":0,"user_frame":user_frame,"unit_type":1})
+            
+            #set CollisionEnable
             ret , result , id = send_command(sock, "setCollisionEnable", {"enable": 1})
-            if ret :
-                print("result =", result )
-            else :
-                print("err_msg=", result ["message"])
-                
-            ret , result , id = send_command(sock, "setCollisionSensitivity", {"value": 50})
-            if ret :
-                print ("result =", result )
-            else :
-                print("err_msg=", result ["message"])
 
+            #set CollisionSensitivity                
+            ret , result , id = send_command(sock, "setCollisionSensitivity", {"value": 50})
             
-            #security parameter
-            
+            #set security parameter
             ret , result , id=send_command(sock,"setAutoRunToolNumber",{"tool_num": 0})
-            if ret :
-                print (" result = ", result )
-            else :
-                print ("err_msg = ", result ["message"])
                 
             #robot arm and cente of gravity
             suc, result , id = send_command(sock, "cmd_set_payload",{"tool_num":0, "m":5, "cog" :[10, 20,30]})
@@ -211,13 +202,11 @@ if __name__ == "__main__":
             suc, result , id = send_command(sock, "setSpeed", {"value": 30})
             
             #set IO status
-            
             for i in range (0, 20 ,1) :
                 # Set output IO status
                 suc, result , id=send_command(sock,"setOutput",{"addr":i,"status":1})
 
             #set virtual io pins
-            
             for i in range(528, 800 ,1) :
                 # Set virtual output IO status
                 suc, result , id=send_command(sock,"setVirtualOutput",{"addr": i ,"status":1})
@@ -229,17 +218,16 @@ if __name__ == "__main__":
             suc, result , id=send_command(sock,"setAnalogOutput",{"addr":3,"value":0.5})
             suc, result , id=send_command(sock,"setAnalogOutput",{"addr":4,"value":0.5})
             
+            # Set system B variable value
             for n in range (0, 11 ,1):
-                # Set system B variable value
                 suc, result , id=send_command(sock,"setSysVarB",{"addr":i,"value":100})
 
-
+            # Set system I variable value
             for n in range (0, 11 ,1):
-                # Set system I variable value
                 suc, result , id=send_command(sock,"setSysVarI",{"addr":i,"value":100})
                 
+            # Set system D variable value    
             for n in range (0, 11 ,1) :
-                # Set system D variable value
                 suc, result , id=send_command(sock,"setSysVarD",{"addr":i,"value":100})
                 
             #set sys variable P
@@ -255,13 +243,11 @@ if __name__ == "__main__":
             
             # Transparent transmission starting point
             P0 = [0, -90, 0, -90, 90, 0]
-            if (conSuc):
-                # Initialize transparent transmission service
-                suc, result , id=send_command(sock,"transparent_transmission_init",{"lookahead":400,"t" :10, "smoothness":0.1})
-                # Set the current transparent transmission target joint point
-                suc, result , id=send_command(sock,"tt_set_current_servo_joint",{"targetPos": P0})
-                
-            
+            # Initialize transparent transmission service
+            suc, result , id=send_command(sock,"transparent_transmission_init",{"lookahead":400,"t" :10, "smoothness":0.1})
+            # Set the current transparent transmission target joint point
+            suc, result , id=send_command(sock,"tt_set_current_servo_joint",{"targetPos": P0})
+
             
             # Set the profinet int output register
             suc, result , id = send_command(sock, "set_profinet_int_output_registers", {"addr": 1, "length": 2, "value": [1,1]})
@@ -276,31 +262,8 @@ if __name__ == "__main__":
             # Set the profinet float type output register
             suc, result , id = send_command(sock, "set_profinet_float_output_registers", {"addr": 0, "length": 2, "value": [1,1]})
 
-            """
-            
-            
-            if robotState == 3:
-                cycle_start_time = time.time()
-                print(cycle_start_time,"------------------------")
-            elif robotState == 1:
-                pass
-            elif robotState == 0:  
-                if cycle_start_time is not None:
-                    print("Cycle start time = ", cycle_start_time)
-                    cycle_end_time = time.time()  # Stop recording time
-                    CycleTime = cycle_end_time - cycle_start_time
-                    print("CycleTime is:", round(CycleTime,2))
-                    cycle_start_time = -1
-                    
-            PowerOnTime = time.time() - ping_start_time
-            print("PowerOnTime is :", round(PowerOnTime,2))
-            
-            if (CycleTime != -1):
-                RobotUtilisation = RobotUtilisation+ round((CycleTime/PowerOnTime),2)*100
-                print("RobotUtilisation is :",RobotUtilisation,"%")
+                
         
-        
-            """
             # Establish connection to InfluxDB
             influx_client = influx_connection()
         
@@ -316,20 +279,3 @@ if __name__ == "__main__":
                 print("Data successfully written to InfluxDB")
             except Exception as e:
                 print(f"Error writing data to InfluxDB: {e}")
-   
-        
-        """
-        if (conSuc == False):
-            ping_end_time = time.time()
-            print(f"Machine is currently unreachable.")
-            if (ping_start_time is not None):
-                PowerOnTime = ping_end_time - ping_start_time
-                print("PowerOnTime is ", round(PowerOnTime,2))
-            if (CycleTime != -1):
-                RobotUtilisation = RobotUtilisation+ round((CycleTime/PowerOnTime),2)*100
-                print("RobotUtilisation------------------------------------------------",RobotUtilisation,"%")
-                cycle_start_time = -1
-            else:
-                print("Not Now")
-            break
-            
