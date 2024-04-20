@@ -171,7 +171,7 @@ def set_sys_var_i():
         messagebox.showerror("Error", "Failed to set setSysVarI")
 
 def set_sys_var_p():
-    input_str = entry_widgets[12].get()
+    input_str = entry_widgets[11].get()
     addr = int(input_str)
     success, result, _ = send_command(sock, "setSysVarP", {"addr": addr})
     if success:
@@ -180,7 +180,7 @@ def set_sys_var_p():
         messagebox.showerror("Error", "Failed to set setSysVarP")
 
 def set_sys_var_v():
-    input_str = entry_widgets[13].get()
+    input_str = entry_widgets[12].get()
     addr, pose = input_str.split(",")
     pose = list(map(float, pose.split()))
     success, result, _ = send_command(sock, "setSysVarV", {"addr": int(addr), "pose": pose})
@@ -190,7 +190,7 @@ def set_sys_var_v():
         messagebox.showerror("Error", "Failed to set setSysVarV")
 
 def transparent_transmission_init():
-    input_str = entry_widgets[14].get()
+    input_str = entry_widgets[13].get()
     lookahead, t, smoothness = map(float, input_str.split(","))
     success, result, _ = send_command(sock, "transparent_transmission_init", {"lookahead": lookahead, "t": t, "smoothness": smoothness})
     if success:
@@ -199,7 +199,7 @@ def transparent_transmission_init():
         messagebox.showerror("Error", "Failed to set transparent_transmission_init")
 
 def tt_set_current_servo_joint():
-    input_str = entry_widgets[15].get()
+    input_str = entry_widgets[14].get()
     target_pos = list(map(float, input_str.split(",")))
     success, result, _ = send_command(sock, "tt_set_current_servo_joint", {"targetPos": target_pos})
     if success:
@@ -208,7 +208,7 @@ def tt_set_current_servo_joint():
         messagebox.showerror("Error", "Failed to set tt_set_current_servo_joint")
 
 def set_profinet_int_output_registers():
-    input_str = entry_widgets[16].get()
+    input_str = entry_widgets[15].get()
     addr, length, value = input_str.split(",")
     value = list(map(int, value.split()))
     success, result, _ = send_command(sock, "set_profinet_int_output_registers", {"addr": int(addr), "length": int(length), "value": value})
@@ -218,7 +218,7 @@ def set_profinet_int_output_registers():
         messagebox.showerror("Error", "Failed to set set_profinet_int_output_registers")
 
 def set_profinet_float_output_registers():
-    input_str = entry_widgets[17].get()
+    input_str = entry_widgets[16].get()
     addr, length, value = input_str.split(",")
     value = list(map(float, value.split()))
     success, result, _ = send_command(sock, "set_profinet_float_output_registers", {"addr": int(addr), "length": int(length), "value": value})
