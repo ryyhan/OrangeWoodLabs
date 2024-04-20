@@ -2,6 +2,7 @@ import tkinter as tk
 import socket
 import json
 from tkinter import messagebox
+from tkinter import ttk
 
 #robot functions
 def connectETController(ip, port=8055):
@@ -71,8 +72,6 @@ def send_command(sock, cmd, params=None, id=1):
             return (False, None, None)
     except Exception as e:
         return (False, None, None)
-
-
 
 #functions to set values
 def set_servo_status():
@@ -171,7 +170,6 @@ def set_sys_var_i():
     else:
         messagebox.showerror("Error", "Failed to set setSysVarI")
 
-
 def set_sys_var_p():
     input_str = entry_widgets[12].get()
     addr = int(input_str)
@@ -229,6 +227,21 @@ def set_profinet_float_output_registers():
     else:
         messagebox.showerror("Error", "Failed to set set_profinet_float_output_registers")
 
+def move_by_Line() -> None:
+
+    point = []
+    point .append([0.0065,-103.9938,102.2076,-88.2138, 90.0000,0.0013])
+    point .append([-16.2806,-82.4996,81.9848,-89.4851, 90.0000, -16.2858])
+    point .append([3.7679, -71.7544, 68.7276, -86.9732, 90.0000, 3.7627])
+    point .append([12.8237,-87.3028,87.2361,-89.9333, 90.0000,12.8185])
+    
+    for i in range (4):
+        # Linear motion
+        suc, result , id=send_command(sock,"moveByLine",{"targetPos":point[i],"speed_type" :0, "speed":200,"cond_type":0,"cond_num":7,"cond_value":1})
+    if suc:
+        messagebox.showinfo("Success", f"Robot moved successfully!")
+    else:
+        messagebox.showerror("Error", "Failed to move robot")       
 
 def establish_connection():
     global sock
@@ -243,11 +256,31 @@ def establish_connection():
 root = tk.Tk()
 root.title("Value Setter")
 
+root.geometry("600x850")
+
+# Create scrollable frame
+main_frame = tk.Frame(root)
+main_frame.pack(fill="both", expand=True)
+
+canvas = tk.Canvas(main_frame)
+canvas.pack(side="left", fill="both", expand=True)
+
+scrollbar = ttk.Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+scrollbar.pack(side="right", fill="y")
+
+canvas.configure(yscrollcommand=scrollbar.set)
+canvas.bind("<Configure>", lambda event: canvas.configure(scrollregion=canvas.bbox("all")))
+
+scrollable_frame = tk.Frame(canvas)
+canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+
+
+
 # Create labels
 labels = [
     "set_servo_status", "setSysVarD", "cmd_set_tcp", "setUserFrame",
     "checkFlangeButton", "setSpeed", "setOutput", "setVirtualOutput",
-    "setAnalogOutput", "setSysVarB", "setSysVarI", "setSysVarD",
+    "setAnalogOutput", "setSysVarB", "setSysVarI",
     "setSysVarP", "setSysVarV", "transparent_transmission_init",
     "tt_set_current_servo_joint", "set_profinet_int_output_registers",
     "set_profinet_float_output_registers"
@@ -255,13 +288,13 @@ labels = [
 
 label_widgets = []
 for label_text in labels:
-    label = tk.Label(root, text=label_text)
+    label = tk.Label(scrollable_frame, text=label_text, padx=10)
     label_widgets.append(label)
 
 # Create text fields
 entry_widgets = []
 for _ in labels:
-    entry = tk.Entry(root)
+    entry = tk.Entry(scrollable_frame)
     entry_widgets.append(entry)
 
 # Create buttons
@@ -286,18 +319,24 @@ button_functions = {
     "set_profinet_float_output_registers": set_profinet_float_output_registers
 }
 for i in range(len(labels)):
-    button = tk.Button(root, text="Set", command=button_functions.get(labels[i], lambda: print("Function not defined")))
+    button = tk.Button(scrollable_frame, text="Set", command=button_functions.get(labels[i], lambda: print("Function not defined")))
     button_widgets.append(button)
 
 # Add button to establish connection
-connect_button = tk.Button(root, text="Connect to the Robot!", command=establish_connection)
-connect_button.grid(row=len(labels), column=1, columnspan=2, padx=5, pady=5)
+connect_button = tk.Button(scrollable_frame, text="Connect to the Robot!", command=establish_connection)
+
+# Add button to moveByLine
+
+move_button = tk.Button(scrollable_frame, text="Move Robot", command=move_by_Line)
 
 
-# Layout labels, text fields, and buttons
+# Layout labels, text fields, buttons, and connect button
 for i in range(len(labels)):
-    label_widgets[i].grid(row=i, column=0, padx=5, pady=5)
+    label_widgets[i].grid(row=i, column=0, padx=(20,5), pady=5, sticky="w")
     entry_widgets[i].grid(row=i, column=1, padx=5, pady=5)
     button_widgets[i].grid(row=i, column=2, padx=5, pady=5)
+
+connect_button.grid(row=len(labels), column=1, columnspan=2, padx=5, pady=5)
+move_button.grid(row=len(labels), column=0, columnspan=2, padx=5, pady=5)
 
 root.mainloop()
