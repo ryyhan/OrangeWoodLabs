@@ -1,6 +1,7 @@
 import tkinter as tk
 import socket
 import json
+from tkinter import messagebox
 
 #robot functions
 def connectETController(ip, port=8055):
@@ -78,97 +79,97 @@ def set_servo_status():
     value = entry_widgets[0].get()
     success, result, _ = send_command(sock, "set_servo_status", {"status": int(value)})
     if success:
-        print("set_servo_status set to:", value)
+        messagebox.showinfo("Success", f"set_servo_status set to: {value}")
     else:
-        print("Failed to set set_servo_status")
+        messagebox.showerror("Error", "Failed to set set_servo_status")
 
 def set_sys_var_d():
     input_str = entry_widgets[1].get()
     addr, value = map(int, input_str.split(","))
     success, result, _ = send_command(sock, "setSysVarD", {"addr": addr, "value": value})
     if success:
-        print("setSysVarD set to:", value)
+        messagebox.showinfo("Success", f"setSysVarD set to: {value}")
     else:
-        print("Failed to set setSysVarD")
+        messagebox.showerror("Error", "Failed to set setSysVarD")
 
 def cmd_set_tcp():
     input_str = entry_widgets[2].get()
     point, tool_num, unit_type = eval(input_str)  # Using eval to parse the list
     success, result, _ = send_command(sock, "cmd_set_tcp", {"point": point, "tool_num": int(tool_num), "unit_type": int(unit_type)})
     if success:
-        print("cmd_set_tcp set to:", input_str)
+        messagebox.showinfo("Success", f"cmd_set_tcp set to: {input_str}")
     else:
-        print("Failed to set cmd_set_tcp")
+        messagebox.showerror("Error", "Failed to set cmd_set_tcp")
 
 def set_user_frame():
     input_str = entry_widgets[3].get()
     user_num, user_frame, unit_type = map(int, input_str.split(","))
     success, result, _ = send_command(sock, "setUserFrame", {"user_num": user_num, "user_frame": user_frame, "unit_type": unit_type})
     if success:
-        print("setUserFrame set to:", input_str)
+        messagebox.showinfo("Success", f"setUserFrame set to: {input_str}")
     else:
-        print("Failed to set setUserFrame")
+        messagebox.showerror("Error", "Failed to set setUserFrame")
 
 def check_flange_button():
     button_num = entry_widgets[4].get()
     success, result, _ = send_command(sock, "checkFlangeButton", {"button_num": int(button_num)})
     if success:
-        print("checkFlangeButton set to:", button_num)
+        messagebox.showinfo("Success", f"checkFlangeButton set to: {button_num}")
     else:
-        print("Failed to set checkFlangeButton")
+        messagebox.showerror("Error", "Failed to set checkFlangeButton")
 
 def set_speed():
     value = entry_widgets[5].get()
     success, result, _ = send_command(sock, "setSpeed", {"value": int(value)})
     if success:
-        print("setSpeed set to:", value)
+        messagebox.showinfo("Success", f"setSpeed set to: {value}")
     else:
-        print("Failed to set setSpeed")
+        messagebox.showerror("Error", "Failed to set setSpeed")
 
 def set_output():
     input_str = entry_widgets[6].get()
     addr, status = map(int, input_str.split(","))
     success, result, _ = send_command(sock, "setOutput", {"addr": addr, "status": status})
     if success:
-        print("setOutput set to:", input_str)
+        messagebox.showinfo("Success", f"setOutput set to: {input_str}")
     else:
-        print("Failed to set setOutput")
+        messagebox.showerror("Error", "Failed to set setOutput")
 
 def set_virtual_output():
     input_str = entry_widgets[7].get()
     addr, status = map(int, input_str.split(","))
     success, result, _ = send_command(sock, "setVirtualOutput", {"addr": addr, "status": status})
     if success:
-        print("setVirtualOutput set to:", input_str)
+        messagebox.showinfo("Success", f"setVirtualOutput set to: {input_str}")
     else:
-        print("Failed to set setVirtualOutput")
+        messagebox.showerror("Error", "Failed to set setVirtualOutput")
 
 def set_analog_output():
     input_str = entry_widgets[8].get()
     addr, value = map(int, input_str.split(","))
     success, result, _ = send_command(sock, "setAnalogOutput", {"addr": addr, "value": value})
     if success:
-        print("setAnalogOutput set to:", input_str)
+        messagebox.showinfo("Success", f"setAnalogOutput set to: {input_str}")
     else:
-        print("Failed to set setAnalogOutput")
+        messagebox.showerror("Error", "Failed to set setAnalogOutput")
 
 def set_sys_var_b():
     input_str = entry_widgets[9].get()
     addr, value = map(int, input_str.split(","))
     success, result, _ = send_command(sock, "setSysVarB", {"addr": addr, "value": value})
     if success:
-        print("setSysVarB set to:", input_str)
+        messagebox.showinfo("Success", f"setSysVarB set to: {input_str}")
     else:
-        print("Failed to set setSysVarB")
+        messagebox.showerror("Error", "Failed to set setSysVarB")
 
 def set_sys_var_i():
     input_str = entry_widgets[10].get()
     addr, value = map(int, input_str.split(","))
     success, result, _ = send_command(sock, "setSysVarI", {"addr": addr, "value": value})
     if success:
-        print("setSysVarI set to:", input_str)
+        messagebox.showinfo("Success", f"setSysVarI set to: {input_str}")
     else:
-        print("Failed to set setSysVarI")
+        messagebox.showerror("Error", "Failed to set setSysVarI")
 
 
 def set_sys_var_p():
@@ -176,9 +177,9 @@ def set_sys_var_p():
     addr = int(input_str)
     success, result, _ = send_command(sock, "setSysVarP", {"addr": addr})
     if success:
-        print("setSysVarP set to:", input_str)
+        messagebox.showinfo("Success", f"setSysVarP set to: {input_str}")
     else:
-        print("Failed to set setSysVarP")
+        messagebox.showerror("Error", "Failed to set setSysVarP")
 
 def set_sys_var_v():
     input_str = entry_widgets[13].get()
@@ -186,27 +187,27 @@ def set_sys_var_v():
     pose = list(map(float, pose.split()))
     success, result, _ = send_command(sock, "setSysVarV", {"addr": int(addr), "pose": pose})
     if success:
-        print("setSysVarV set to:", input_str)
+        messagebox.showinfo("Success", f"setSysVarV set to: {input_str}")
     else:
-        print("Failed to set setSysVarV")
+        messagebox.showerror("Error", "Failed to set setSysVarV")
 
 def transparent_transmission_init():
     input_str = entry_widgets[14].get()
     lookahead, t, smoothness = map(float, input_str.split(","))
     success, result, _ = send_command(sock, "transparent_transmission_init", {"lookahead": lookahead, "t": t, "smoothness": smoothness})
     if success:
-        print("transparent_transmission_init set to:", input_str)
+        messagebox.showinfo("Success", f"transparent_transmission_init set to: {input_str}")
     else:
-        print("Failed to set transparent_transmission_init")
+        messagebox.showerror("Error", "Failed to set transparent_transmission_init")
 
 def tt_set_current_servo_joint():
     input_str = entry_widgets[15].get()
     target_pos = list(map(float, input_str.split(",")))
     success, result, _ = send_command(sock, "tt_set_current_servo_joint", {"targetPos": target_pos})
     if success:
-        print("tt_set_current_servo_joint set to:", input_str)
+        messagebox.showinfo("Success", f"tt_set_current_servo_joint set to: {input_str}")
     else:
-        print("Failed to set tt_set_current_servo_joint")
+        messagebox.showerror("Error", "Failed to set tt_set_current_servo_joint")
 
 def set_profinet_int_output_registers():
     input_str = entry_widgets[16].get()
@@ -214,9 +215,9 @@ def set_profinet_int_output_registers():
     value = list(map(int, value.split()))
     success, result, _ = send_command(sock, "set_profinet_int_output_registers", {"addr": int(addr), "length": int(length), "value": value})
     if success:
-        print("set_profinet_int_output_registers set to:", input_str)
+        messagebox.showinfo("Success", f"set_profinet_int_output_registers set to: {input_str}")
     else:
-        print("Failed to set set_profinet_int_output_registers")
+        messagebox.showerror("Error", "Failed to set set_profinet_int_output_registers")
 
 def set_profinet_float_output_registers():
     input_str = entry_widgets[17].get()
@@ -224,9 +225,9 @@ def set_profinet_float_output_registers():
     value = list(map(float, value.split()))
     success, result, _ = send_command(sock, "set_profinet_float_output_registers", {"addr": int(addr), "length": int(length), "value": value})
     if success:
-        print("set_profinet_float_output_registers set to:", input_str)
+        messagebox.showinfo("Success", f"set_profinet_float_output_registers set to: {input_str}")
     else:
-        print("Failed to set set_profinet_float_output_registers")
+        messagebox.showerror("Error", "Failed to set set_profinet_float_output_registers")
 
 
 def establish_connection():
@@ -234,9 +235,9 @@ def establish_connection():
     robot_ip = "192.168.1.200"
     conSuc, sock = connectETController(robot_ip)
     if conSuc:
-        print("Connection successful")
+        messagebox.showinfo("Success", "Connection successful")
     else:
-        print("Failed to establish connection")
+        messagebox.showerror("Error", "Failed to establish connection")
 
 
 root = tk.Tk()
