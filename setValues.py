@@ -84,7 +84,7 @@ def set_servo_status():
 
 def set_sys_var_d():
     input_str = entry_widgets[1].get()
-    addr, value = map(int, input_str.split(","))
+    addr, value = map(int, input_str.split(";"))
     success, result, _ = send_command(sock, "setSysVarD", {"addr": addr, "value": value})
     if success:
         messagebox.showinfo("Success", f"setSysVarD set to: {value}")
@@ -93,7 +93,13 @@ def set_sys_var_d():
 
 def cmd_set_tcp():
     input_str = entry_widgets[2].get()
-    point, tool_num, unit_type = eval(input_str)  # Using eval to parse the list
+
+    parts = input_str.split(";")
+
+    point = list(map(float, parts[0].split(",")))
+    tool_num = int(parts[1])
+    unit_type = int(parts[2])
+
     success, result, _ = send_command(sock, "cmd_set_tcp", {"point": point, "tool_num": int(tool_num), "unit_type": int(unit_type)})
     if success:
         messagebox.showinfo("Success", f"cmd_set_tcp set to: {input_str}")
@@ -102,13 +108,22 @@ def cmd_set_tcp():
 
 def set_user_frame():
     input_str = entry_widgets[3].get()
-    user_num, user_frame, unit_type = map(int, input_str.split(","))
+    parts = input_str.split(";")
+
+    user_num = int(parts[0])
+    user_frame = list(map(float, parts[1].split(",")))
+    unit_type = int(parts[2])
+
+    print(f"first:{user_num}, second{user_frame}, third:{unit_type}")
     success, result, _ = send_command(sock, "setUserFrame", {"user_num": user_num, "user_frame": user_frame, "unit_type": unit_type})
     if success:
         messagebox.showinfo("Success", f"setUserFrame set to: {input_str}")
     else:
         messagebox.showerror("Error", "Failed to set setUserFrame")
 
+#collision enable
+#collision sensitivity
+#setAutoRunToolNumber
 def check_flange_button():
     button_num = entry_widgets[4].get()
     success, result, _ = send_command(sock, "checkFlangeButton", {"button_num": int(button_num)})
@@ -127,7 +142,11 @@ def set_speed():
 
 def set_output():
     input_str = entry_widgets[6].get()
-    addr, status = map(int, input_str.split(","))
+
+    parts = input_str.split(";")
+    addr = int(parts[0])
+    status = int(parts[1])
+
     success, result, _ = send_command(sock, "setOutput", {"addr": addr, "status": status})
     if success:
         messagebox.showinfo("Success", f"setOutput set to: {input_str}")
@@ -136,7 +155,11 @@ def set_output():
 
 def set_virtual_output():
     input_str = entry_widgets[7].get()
-    addr, status = map(int, input_str.split(","))
+
+    parts = input_str.split(";")
+    addr = int(parts[0])
+    status = int(parts[1])
+
     success, result, _ = send_command(sock, "setVirtualOutput", {"addr": addr, "status": status})
     if success:
         messagebox.showinfo("Success", f"setVirtualOutput set to: {input_str}")
@@ -145,7 +168,11 @@ def set_virtual_output():
 
 def set_analog_output():
     input_str = entry_widgets[8].get()
-    addr, value = map(int, input_str.split(","))
+
+    parts = input_str.split(";")
+    addr = int(parts[0])
+    value = int(parts[1])
+
     success, result, _ = send_command(sock, "setAnalogOutput", {"addr": addr, "value": value})
     if success:
         messagebox.showinfo("Success", f"setAnalogOutput set to: {input_str}")
@@ -154,7 +181,11 @@ def set_analog_output():
 
 def set_sys_var_b():
     input_str = entry_widgets[9].get()
-    addr, value = map(int, input_str.split(","))
+
+    parts = input_str.split(";")
+    addr = int(parts[0])
+    value = int(parts[1])
+
     success, result, _ = send_command(sock, "setSysVarB", {"addr": addr, "value": value})
     if success:
         messagebox.showinfo("Success", f"setSysVarB set to: {input_str}")
@@ -163,7 +194,11 @@ def set_sys_var_b():
 
 def set_sys_var_i():
     input_str = entry_widgets[10].get()
-    addr, value = map(int, input_str.split(","))
+
+    parts = input_str.split(";")
+    addr = int(parts[0])
+    value = int(parts[1])
+
     success, result, _ = send_command(sock, "setSysVarI", {"addr": addr, "value": value})
     if success:
         messagebox.showinfo("Success", f"setSysVarI set to: {input_str}")
@@ -172,8 +207,12 @@ def set_sys_var_i():
 
 def set_sys_var_p():
     input_str = entry_widgets[11].get()
-    addr = int(input_str)
-    success, result, _ = send_command(sock, "setSysVarP", {"addr": addr})
+
+    parts = input_str.split(";")
+    addr = int(parts[0])
+    point = list(map(float, parts[1].split(",")))
+    
+    success, result, _ = send_command(sock,"setSysVarP",{"addr":addr,"pos":point})
     if success:
         messagebox.showinfo("Success", f"setSysVarP set to: {input_str}")
     else:
@@ -181,8 +220,11 @@ def set_sys_var_p():
 
 def set_sys_var_v():
     input_str = entry_widgets[12].get()
-    addr, pose = input_str.split(",")
-    pose = list(map(float, pose.split()))
+   
+    parts = input_str.split(";")
+    addr = int(parts[0])
+    pose = list(map(float, parts[1].split(",")))
+
     success, result, _ = send_command(sock, "setSysVarV", {"addr": int(addr), "pose": pose})
     if success:
         messagebox.showinfo("Success", f"setSysVarV set to: {input_str}")
@@ -191,7 +233,12 @@ def set_sys_var_v():
 
 def transparent_transmission_init():
     input_str = entry_widgets[13].get()
-    lookahead, t, smoothness = map(float, input_str.split(","))
+
+    parts = input_str.split(";")
+    lookahead = int(parts[0])
+    t = int(parts[1])
+    smoothness = int(parts[2])
+
     success, result, _ = send_command(sock, "transparent_transmission_init", {"lookahead": lookahead, "t": t, "smoothness": smoothness})
     if success:
         messagebox.showinfo("Success", f"transparent_transmission_init set to: {input_str}")
@@ -200,7 +247,10 @@ def transparent_transmission_init():
 
 def tt_set_current_servo_joint():
     input_str = entry_widgets[14].get()
-    target_pos = list(map(float, input_str.split(",")))
+    
+    parts = input_str.split(";")
+    targetPos = list(map(float, parts[0].split(",")))
+
     success, result, _ = send_command(sock, "tt_set_current_servo_joint", {"targetPos": target_pos})
     if success:
         messagebox.showinfo("Success", f"tt_set_current_servo_joint set to: {input_str}")
@@ -209,8 +259,13 @@ def tt_set_current_servo_joint():
 
 def set_profinet_int_output_registers():
     input_str = entry_widgets[15].get()
-    addr, length, value = input_str.split(",")
-    value = list(map(int, value.split()))
+   
+    parts = input_str.split(";")
+
+    address = int(parts[0])
+    length = int(parts[1])
+    value = list(map(float, parts[2].split(",")))
+
     success, result, _ = send_command(sock, "set_profinet_int_output_registers", {"addr": int(addr), "length": int(length), "value": value})
     if success:
         messagebox.showinfo("Success", f"set_profinet_int_output_registers set to: {input_str}")
@@ -219,13 +274,34 @@ def set_profinet_int_output_registers():
 
 def set_profinet_float_output_registers():
     input_str = entry_widgets[16].get()
-    addr, length, value = input_str.split(",")
-    value = list(map(float, value.split()))
+    
+    parts = input_str.split(";")
+
+    address = int(parts[0])
+    length = int(parts[1])
+    value = list(map(float, parts[2].split(",")))
+
     success, result, _ = send_command(sock, "set_profinet_float_output_registers", {"addr": int(addr), "length": int(length), "value": value})
     if success:
         messagebox.showinfo("Success", f"set_profinet_float_output_registers set to: {input_str}")
     else:
         messagebox.showerror("Error", "Failed to set set_profinet_float_output_registers")
+
+def set_eip_int_output_registers():
+    input_str = entry_widgets[17].get()
+    
+    parts = input_str.split(";")
+
+    address = int(parts[0])
+    length = int(parts[1])
+    value = list(map(float, parts[2].split(",")))
+
+    success, result, _ = send_command(sock, "set_eip_int_output_registers", {"addr": 1, "length": 2, "value": [1,1]})
+    if success:
+        messagebox.showinfo("Success", f"set_eip_int_output_registers set to: {input_str}")
+    else:
+        messagebox.showerror("Error", "Failed to set set_eip_int_output_registers")
+        
 
 def move_by_Line() -> None:
 
@@ -255,8 +331,19 @@ def establish_connection():
 
 root = tk.Tk()
 root.title("Value Setter")
+root.attributes("-fullscreen", True)  # Open the window in full-screen mode
 
-root.geometry("600x850")
+# Define dark mode theme
+style = ttk.Style()
+style.theme_use("clam")  # Choose one of the existing themes to inherit settings from
+style.configure("Dark.TLabel", foreground="white", background="black")  # Define label style for dark mode
+style.configure("Dark.TEntry", foreground="white", background="gray20", fieldbackground="gray30")  # Define entry field style for dark mode
+style.configure("Dark.TButton", foreground="white", background="gray30")  # Define button style for dark mode
+
+# Create a heading label
+heading_label = ttk.Label(root, text="SET VALUES TO THE ROBOT", style="Dark.TLabel")
+heading_label.config(font=("Helvetica", 36, "bold italic"), foreground="white")  # Customize font, size, weight, and color
+heading_label.pack(pady=20)
 
 # Create scrollable frame
 main_frame = tk.Frame(root)
@@ -283,18 +370,18 @@ labels = [
     "setAnalogOutput", "setSysVarB", "setSysVarI",
     "setSysVarP", "setSysVarV", "transparent_transmission_init",
     "tt_set_current_servo_joint", "set_profinet_int_output_registers",
-    "set_profinet_float_output_registers"
+    "set_profinet_float_output_registers", "set_eip_int_output_registers"
 ]
 
 label_widgets = []
 for label_text in labels:
-    label = tk.Label(scrollable_frame, text=label_text, padx=10)
+    label = tk.Label(scrollable_frame, text=label_text, padx=50, pady=15)
     label_widgets.append(label)
 
 # Create text fields
 entry_widgets = []
 for _ in labels:
-    entry = tk.Entry(scrollable_frame)
+    entry = ttk.Entry(scrollable_frame, width=20)
     entry_widgets.append(entry)
 
 # Create buttons
@@ -316,27 +403,37 @@ button_functions = {
     "transparent_transmission_init": transparent_transmission_init,
     "tt_set_current_servo_joint": tt_set_current_servo_joint,
     "set_profinet_int_output_registers": set_profinet_int_output_registers,
-    "set_profinet_float_output_registers": set_profinet_float_output_registers
+    "set_profinet_float_output_registers": set_profinet_float_output_registers,
+    "set_eip_int_output_registers": set_eip_int_output_registers
 }
 for i in range(len(labels)):
-    button = tk.Button(scrollable_frame, text="Set", command=button_functions.get(labels[i], lambda: print("Function not defined")))
+    button = ttk.Button(scrollable_frame, text="Set", style="Dark.TButton", command=button_functions.get(labels[i], lambda: print("Function not defined")))
     button_widgets.append(button)
 
-# Add button to establish connection
-connect_button = tk.Button(scrollable_frame, text="Connect to the Robot!", command=establish_connection)
-
-# Add button to moveByLine
-
-move_button = tk.Button(scrollable_frame, text="Move Robot", command=move_by_Line)
-
-
 # Layout labels, text fields, buttons, and connect button
-for i in range(len(labels)):
-    label_widgets[i].grid(row=i, column=0, padx=(20,5), pady=5, sticky="w")
-    entry_widgets[i].grid(row=i, column=1, padx=5, pady=5)
-    button_widgets[i].grid(row=i, column=2, padx=5, pady=5)
+half_labels = len(labels) // 2
+# Place the widgets for the first half on the left side
+for i in range(half_labels):
+    label_widgets[i].grid(row=i, column=0, padx=(20,5), pady=5, sticky="e")
+    entry_widgets[i].grid(row=i, column=1, padx=5, pady=5, sticky="w")
+    button_widgets[i].grid(row=i, column=2, padx=5, pady=5, sticky="w")
 
-connect_button.grid(row=len(labels), column=1, columnspan=2, padx=5, pady=5)
-move_button.grid(row=len(labels), column=0, columnspan=2, padx=5, pady=5)
+# Place the widgets for the second half on the right side
+for i in range(half_labels, len(labels)):
+    offset = i - half_labels
+    label_widgets[i].grid(row=offset, column=3, padx=(20,5), pady=5, sticky="e")
+    entry_widgets[i].grid(row=offset, column=4, padx=5, pady=5, sticky="w")
+    button_widgets[i].grid(row=offset, column=5, padx=5, pady=5, sticky="w")
 
+# Add the Connect and Move buttons at the bottom
+connect_button = ttk.Button(root, text="Connect to the Robot!", style="Dark.TButton", command=establish_connection)
+connect_button.pack(side="bottom", padx=10, pady=10)
+
+move_text = ttk.Entry(root, width=40)  
+move_text.pack(side="top", padx=40, pady=10)
+move_button = ttk.Button(root, text="Move Robot", style="Dark.TButton", command=move_by_Line)
+move_button.pack(side="bottom", padx=40, pady=10)
+
+root.resizable(False, False)
 root.mainloop()
+ 
